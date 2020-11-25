@@ -1,0 +1,8 @@
+rootProject.name='NetProject'
+include ':app'
+include ':basesdk'
+include ':module_router'
+apply from: './base.gradle'
+gradle.ext {
+    sdk = sdk
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/bmapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true" />
+    <top.androidman.SuperButton
+        android:layout_width="80dp"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="20dp"
+        android:id="@+id/map_button"
+        app:color_normal="@color/color_6596ff"
+        app:color_pressed="@color/colorAccent"
+        app:corner="40dp"
+        app:corner_left_bottom="0dp"
+        app:text="返回"
+        app:textColor="@color/color_white"
+        app:textSize="22sp" />
+    <TextView
+        android:id="@+id/position_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+
+
+</RelativeLayout>
