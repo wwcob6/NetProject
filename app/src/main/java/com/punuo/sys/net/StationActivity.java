@@ -2,6 +2,8 @@ package com.punuo.sys.net;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -11,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,12 +25,20 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.google.gson.internal.bind.MapTypeAdapterFactory;
+import com.punuo.sys.net.push.GetStationsModel;
+import com.punuo.sys.net.push.GetStationsRequest;
+import com.punuo.sys.sdk.httplib.HttpManager;
+import com.punuo.sys.sdk.httplib.RequestListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +68,13 @@ public class StationActivity extends Activity implements View.OnClickListener {
         superButton.setOnClickListener(this);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
+        BaiduMap.OnMapLongClickListener listener = new BaiduMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                showAboutDialog(latLng);
+            }
+        };
+        baiduMap.setOnMapLongClickListener(listener);
         positionText = (TextView) findViewById(R.id.position_text_view);
         List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(StationActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -75,7 +93,68 @@ public class StationActivity extends Activity implements View.OnClickListener {
             requestLocation();
         }
     }
+    public void showAboutDialog(LatLng latLng){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        TextView title = new TextView(this);
+        title.setText("当前经纬度");
+        title.setPadding(10,10,10,10);
+        title.setGravity(Gravity.CENTER);
+        title.setTextSize(20);
+        title.setTextColor(getResources().getColor(R.color.common_title_bg));
+        dialog.setCustomTitle(title);
+        dialog.setMessage("当前所在地经度是" + latLng.latitude+"纬度是"+latLng.longitude);
+        dialog.setPositiveButton("显示附近基站", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                getStationsLocation(latLng.latitude,latLng.longitude);
+            }
+        });
+        dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+    private GetStationsRequest getStationsRequest;
+    public void getStationsLocation (double latitude, double longitude){
+        if (getStationsRequest != null && !getStationsRequest.isFinished){
+            return;
+        }
+        getStationsRequest = new GetStationsRequest();
+        getStationsRequest.addUrlParam("latitude",latitude);
+        getStationsRequest.addUrlParam("longitude",longitude);
+        getStationsRequest.setRequestListener(new RequestListener<GetStationsModel>() {
+            @Override
+            public void onComplete() {
 
+            }
+
+            @Override
+            public void onSuccess(GetStationsModel result) {
+                if (result == null) {
+                    return;
+                }
+                LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
+                //构建Marker图标
+                BitmapDescriptor bitmap = BitmapDescriptorFactory
+                        .fromResource(R.drawable.ic_basestation);
+                //构建MarkerOption，用于在地图上添加Marker
+                OverlayOptions option = new MarkerOptions()
+                        .position(point)
+                        .icon(bitmap);
+                //在地图上添加Marker，并显示
+                baiduMap.addOverlay(option);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(StationActivity.this,"获取失败",Toast.LENGTH_LONG).show();
+            }
+        });
+        HttpManager.addRequest(getStationsRequest);
+    }
 
     private void navigateTo(BDLocation location) {
         if (isFirstLocate) {
