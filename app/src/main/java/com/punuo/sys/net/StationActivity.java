@@ -2,6 +2,7 @@ package com.punuo.sys.net;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,13 +32,15 @@ import com.google.gson.internal.bind.MapTypeAdapterFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StationActivity extends Activity {
+import top.androidman.SuperButton;
+
+public class StationActivity extends Activity implements View.OnClickListener {
     public LocationClient mLocationClient;
 
     private TextView positionText;
 
     private MapView mapView;
-
+    private SuperButton superButton;
     private BaiduMap baiduMap;
 
     private boolean isFirstLocate = true;
@@ -49,6 +53,8 @@ public class StationActivity extends Activity {
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_station);
         mapView = (MapView) findViewById(R.id.bmapView);
+        superButton = findViewById(R.id.r_button);
+        superButton.setOnClickListener(this);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
         positionText = (TextView) findViewById(R.id.position_text_view);
@@ -143,6 +149,12 @@ public class StationActivity extends Activity {
                 break;
             default:
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(StationActivity.this,ChooseActivity.class);
+        startActivity(intent);
     }
 
     public class MyLocationListener implements BDLocationListener {

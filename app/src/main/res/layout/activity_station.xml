@@ -16,7 +16,7 @@
         android:layout_centerInParent="true"
         android:layout_alignParentTop="true"
         android:layout_margin="20dp"
-        android:id="@+id/map_button"
+        android:id="@+id/r_button"
         app:color_normal="@color/color_6596ff"
         app:color_pressed="@color/colorAccent"
         app:corner="40dp"
