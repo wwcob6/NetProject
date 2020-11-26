@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
@@ -44,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import top.androidman.SuperButton;
+
+import static org.greenrobot.eventbus.EventBus.TAG;
 
 public class StationActivity extends Activity implements View.OnClickListener {
     public LocationClient mLocationClient;
@@ -106,7 +109,8 @@ public class StationActivity extends Activity implements View.OnClickListener {
         dialog.setPositiveButton("显示附近基站", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                getStationsLocation(latLng.latitude,latLng.longitude);
+                Log.i(TAG, "onClick: 点击");
+                getStationsLocation("30.258780","120.215400");
             }
         });
         dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -118,13 +122,14 @@ public class StationActivity extends Activity implements View.OnClickListener {
         dialog.show();
     }
     private GetStationsRequest getStationsRequest;
-    public void getStationsLocation (double latitude, double longitude){
+    public void getStationsLocation (String latitude, String longitude){
         if (getStationsRequest != null && !getStationsRequest.isFinished){
             return;
         }
         getStationsRequest = new GetStationsRequest();
-        getStationsRequest.addUrlParam("latitude",latitude);
         getStationsRequest.addUrlParam("longitude",longitude);
+        getStationsRequest.addUrlParam("latitude",latitude);
+
         getStationsRequest.setRequestListener(new RequestListener<GetStationsModel>() {
             @Override
             public void onComplete() {
@@ -136,7 +141,8 @@ public class StationActivity extends Activity implements View.OnClickListener {
                 if (result == null) {
                     return;
                 }
-                LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
+                Toast.makeText(StationActivity.this,result.stations.latitude+"和"+result.stations.longitude,Toast.LENGTH_LONG);
+                /*LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
                 //构建Marker图标
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
                         .fromResource(R.drawable.ic_basestation);
@@ -145,12 +151,12 @@ public class StationActivity extends Activity implements View.OnClickListener {
                         .position(point)
                         .icon(bitmap);
                 //在地图上添加Marker，并显示
-                baiduMap.addOverlay(option);
+                baiduMap.addOverlay(option);*/
             }
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(StationActivity.this,"获取失败",Toast.LENGTH_LONG).show();
+                Log.i(TAG, "onError:");
             }
         });
         HttpManager.addRequest(getStationsRequest);

@@ -5,12 +5,12 @@ import com.punuo.sys.sdk.model.BaseModel;
 
 public class GetStationsModel extends BaseModel {
     @SerializedName("stations")
-    public getstationlocationmodel.location stations;
-    public static class location {
-        @SerializedName("longitude")
+    public Location stations;
+    public static class Location {
+        @SerializedName("lng")
         public double longitude;
 
-        @SerializedName("latitude")
+        @SerializedName("lat")
         public double latitude;
     }
 }
