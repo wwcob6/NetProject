@@ -28,7 +28,7 @@ public class ProcessTasks {
         HttpConfig.init(new IHttpConfig() {
             @Override
             public String getHost() {
-                return "pet.qinqingonline.com";
+                return "101.69.255.134";
             }
 
             @Override
