@@ -92,7 +92,6 @@ public class Sinr extends Activity implements SensorEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sinr);
-        ProcessTasks.commonLaunchTasks(PnApplication.getInstance());
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         initView();
 

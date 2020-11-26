@@ -133,7 +133,6 @@ public class MainActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ProcessTasks.commonLaunchTasks(PnApplication.getInstance());
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         netType = findViewById(R.id.netType);
         superButton = findViewById(R.id.return_button);

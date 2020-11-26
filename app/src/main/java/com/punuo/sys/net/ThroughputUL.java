@@ -96,7 +96,6 @@ public class ThroughputUL extends Activity implements SensorEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ul);
-        ProcessTasks.commonLaunchTasks(PnApplication.getInstance());
         initView();
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);// 获取传感器管理服务

@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -43,9 +42,7 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.punuo.sys.net.push.GetStationLocationRequest;
-import com.punuo.sys.net.push.ProcessTasks;
 import com.punuo.sys.net.push.getstationlocationmodel;
-import com.punuo.sys.sdk.PnApplication;
 import com.punuo.sys.sdk.httplib.HttpManager;
 import com.punuo.sys.sdk.httplib.RequestListener;
 
@@ -97,7 +94,6 @@ public class DynamicDemo extends Activity implements SensorEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dyn);
-        ProcessTasks.commonLaunchTasks(PnApplication.getInstance());
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         initView();
 

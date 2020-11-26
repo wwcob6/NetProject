@@ -13,8 +13,8 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true"
         tools:replace="android:theme">
-        <activity android:name=".StationActivity"></activity>
-        <activity android:name=".ChooseActivity"></activity>
+        <activity android:name=".StationActivity"/>
+        <activity android:name=".ChooseActivity"/>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +26,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="fullSensor"></activity>
+            android:screenOrientation="fullSensor"/>
         <activity
             android:name=".DynamicDemo"
             android:configChanges="orientation|keyboardHidden"

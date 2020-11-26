@@ -6,40 +6,31 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.google.gson.internal.bind.MapTypeAdapterFactory;
 import com.punuo.sys.net.push.GetStationsModel;
 import com.punuo.sys.net.push.GetStationsRequest;
 import com.punuo.sys.sdk.httplib.HttpManager;
 import com.punuo.sys.sdk.httplib.RequestListener;
+import com.punuo.sys.sdk.util.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +132,7 @@ public class StationActivity extends Activity implements View.OnClickListener {
                 if (result == null) {
                     return;
                 }
-                Toast.makeText(StationActivity.this,result.stations.latitude+"和"+result.stations.longitude,Toast.LENGTH_LONG);
+                ToastUtils.showToast(result.stations.latitude+"和"+result.stations.longitude);
                 /*LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
                 //构建Marker图标
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
@@ -164,7 +155,7 @@ public class StationActivity extends Activity implements View.OnClickListener {
 
     private void navigateTo(BDLocation location) {
         if (isFirstLocate) {
-            Toast.makeText(this, "nav to " + location.getAddrStr(), Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast("nav to " + location.getAddrStr());
             LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
