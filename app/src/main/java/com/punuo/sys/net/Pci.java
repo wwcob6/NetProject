@@ -153,7 +153,7 @@ public class Pci extends Activity implements SensorEventListener {
 
         Button start = (Button) findViewById(R.id.buttonStart);
         Button finish = (Button) findViewById(R.id.buttonFinish);
-        Button getstation = (Button) findViewById(R.id.buttongetstation);
+        /*Button getstation = (Button) findViewById(R.id.buttongetstation);*/
         info = (TextView) findViewById(R.id.info);
         progressBarRl = (RelativeLayout) findViewById(R.id.progressBarRl);
         position = findViewById(R.id.LatandLong);
@@ -185,7 +185,7 @@ public class Pci extends Activity implements SensorEventListener {
             }
         }
 
-        getstation.setOnClickListener(new View.OnClickListener() {
+        /*getstation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final EditText editText = new EditText(Pci.this);
@@ -202,7 +202,7 @@ public class Pci extends Activity implements SensorEventListener {
                 }).show();
 
             }
-        });
+        });*/
 
         start.setOnClickListener(new View.OnClickListener() {
 

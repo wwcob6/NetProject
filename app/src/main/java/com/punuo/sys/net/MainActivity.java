@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity{
     private Button pcibutton;
 
     private SDKReceiver mReceiver;
-
+    private String telInfo;
     /**
      * 构造广播监听类，监听 SDK key 验证以及网络异常广播
      */
@@ -263,18 +263,22 @@ public class MainActivity extends BaseActivity{
                 infoMap.put(0,4915882);
                 infoMap.put(1,"NSA_H_杭州西湖留下BBU9");
                 infoMap.put(2,cellIdentityNr.getPci());
+                Log.i(TAG, "PCI"+cellIdentityNr.getPci());
                 infoMap.put(18,cellIdentityNr.getMncString());
                 infoMap.put(19,cellIdentityNr.getMccString());
                 CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) cellInfoNr.getCellSignalStrength();
 
+//                infoMap.put(3,-cellSignalStrengthNr.getSsRsrp());
                 infoMap.put(3,-cellSignalStrengthNr.getSsRsrp());
                 infoMap.put(4,-cellSignalStrengthNr.getSsRsrp());
 
+//                infoMap.put(5,cellSignalStrengthNr.getSsSinr());
                 infoMap.put(5,cellSignalStrengthNr.getSsSinr());
                 infoMap.put(6,cellSignalStrengthNr.getSsSinr());
                 infoMap.put(11,51);
                 infoMap.put(12,51);
                 infoMap.put(13,0);
+                telInfo = cellSignalStrengthNr.toString();
             }
         }
     }
@@ -295,9 +299,10 @@ public class MainActivity extends BaseActivity{
         MainActivityPermissionsDispatcher.getAllCellInfoWithCheck(this);
         getOtherData();
 
-//        for (Map.Entry<Integer, Object> entry : infoMap.entrySet()) {
-//            Log.i(TAG, "整个map中的数据 ：key= " + entry.getKey() + " and value= " + entry.getValue());
-//        }
+        for (Map.Entry<Integer, Object> entry : infoMap.entrySet()) {
+            Log.i(TAG, "整个map中的数据 ：key= " + entry.getKey() + " and value= " + entry.getValue());
+        }
+
         pushInfo();
         showData();
         contentList.clear();
@@ -314,8 +319,8 @@ public class MainActivity extends BaseActivity{
         contentList.add(new Content("MNC",String.valueOf(infoMap.get(18))));
         contentList.add(new Content("MCC",String.valueOf(infoMap.get(19))));
         contentList.add(new Content("PCI",String.valueOf(infoMap.get(2))));
-        contentList.add(new Content("RSRP",String.valueOf(infoMap.get(3))));
-        contentList.add(new Content("SINR",String.valueOf(infoMap.get(5))));
+        contentList.add(new Content("RSRP(dBm)",String.valueOf(infoMap.get(4))));
+        contentList.add(new Content("SINR(dB)",String.valueOf(infoMap.get(6))));
         contentList.add(new Content("DELAY_REQUEST",String.valueOf(infoMap.get(7))));
         contentList.add(new Content("DELAY_SUCCESS",String.valueOf(infoMap.get(8))));
         contentList.add(new Content("DELAY_FAIL",String.valueOf(infoMap.get(9))));
@@ -359,6 +364,7 @@ public class MainActivity extends BaseActivity{
         mPushRequest.addUrlParam("THROUGHPUT_UL",infoMap.get(16));
         mPushRequest.addUrlParam("THROUGHPUT_DL",infoMap.get(17));
         mPushRequest.setRequestListener(new RequestListener<BaseModel>() {
+
             @Override
             public void onComplete() {
 

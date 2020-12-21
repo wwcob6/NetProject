@@ -21,11 +21,18 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.punuo.sys.net.clusterutil.clustering.Cluster;
+import com.punuo.sys.net.clusterutil.clustering.ClusterManager;
 import com.punuo.sys.net.push.GetStationsModel;
 import com.punuo.sys.net.push.GetStationsRequest;
 import com.punuo.sys.sdk.httplib.HttpManager;
@@ -47,9 +54,9 @@ public class StationActivity extends Activity implements View.OnClickListener {
     private MapView mapView;
     private SuperButton superButton;
     private BaiduMap baiduMap;
-
+    private ClusterManager<MyItem> mClusterManager;
     private boolean isFirstLocate = true;
-
+    private List<MyItem> items = new ArrayList<MyItem>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +76,30 @@ public class StationActivity extends Activity implements View.OnClickListener {
             }
         };
         baiduMap.setOnMapLongClickListener(listener);
-        positionText = (TextView) findViewById(R.id.position_text_view);
+        Log.i(TAG, "成功1");mClusterManager = new ClusterManager<MyItem>(this, baiduMap);
+        BaiduMap.OnMapStatusChangeListener onMapStatusChangeListener = new BaiduMap.OnMapStatusChangeListener() {
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus) {
+
+            }
+
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus, int i) {
+
+            }
+
+            @Override
+            public void onMapStatusChange(MapStatus mapStatus) {
+
+            }
+
+            @Override
+            public void onMapStatusChangeFinish(MapStatus mapStatus) {
+
+            }
+        };
+        baiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
+        /*positionText = (TextView) findViewById(R.id.position_text_view);*/
         List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(StationActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -87,6 +117,36 @@ public class StationActivity extends Activity implements View.OnClickListener {
             requestLocation();
         }
     }
+
+    private void addMarkers() {
+
+    }
+
+    private void initCluster() {
+        Log.i("ww", "成功2");
+        // 定义点聚合管理类ClusterManager
+        mClusterManager = new ClusterManager<MyItem>(this,baiduMap);
+        baiduMap.setOnMapStatusChangeListener(mClusterManager);
+        baiduMap.setOnMarkerClickListener(mClusterManager);
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MyItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<MyItem> cluster) {
+                Toast.makeText(StationActivity.this, "有" + cluster.getSize() + "个点",
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+        mClusterManager.setOnClusterItemClickListener(
+                new ClusterManager.OnClusterItemClickListener<MyItem>() {
+                    @Override
+                    public boolean onClusterItemClick(MyItem item) {
+                        Toast.makeText(StationActivity.this, "点击单个Item", Toast.LENGTH_SHORT)
+                                .show();
+                        return false;
+                    }
+                });
+    }
+
     public void showAboutDialog(LatLng latLng){
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         TextView title = new TextView(this);
@@ -96,12 +156,12 @@ public class StationActivity extends Activity implements View.OnClickListener {
         title.setTextSize(20);
         title.setTextColor(getResources().getColor(R.color.common_title_bg));
         dialog.setCustomTitle(title);
-        dialog.setMessage("当前所在地经度是" + latLng.latitude+"纬度是"+latLng.longitude);
+        dialog.setMessage("当前所在地经度是" + latLng.latitude+"\n"+"纬度是"+latLng.longitude);
         dialog.setPositiveButton("显示附近基站", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.i(TAG, "onClick: 点击");
-                getStationsLocation("30.258780","120.215400");
+                getStationsLocation(latLng.latitude,latLng.longitude);
             }
         });
         dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -113,7 +173,8 @@ public class StationActivity extends Activity implements View.OnClickListener {
         dialog.show();
     }
     private GetStationsRequest getStationsRequest;
-    public void getStationsLocation (String latitude, String longitude){
+    public void getStationsLocation (double latitude, double
+            longitude){
         if (getStationsRequest != null && !getStationsRequest.isFinished){
             return;
         }
@@ -132,7 +193,22 @@ public class StationActivity extends Activity implements View.OnClickListener {
                 if (result == null) {
                     return;
                 }
-                ToastUtils.showToast(result.stations.latitude+"和"+result.stations.longitude);
+                initCluster();
+                for (int i = 0; i <  result.stationsList.size(); i++) {
+                    LatLng point = new LatLng(result.stationsList.get(i).latitude, result.stationsList.get(i).longitude);
+                    items.add(new MyItem(point));
+                    Log.i("ww", "onSuccess: "+i);
+                    //构建Marker图标
+                    /*BitmapDescriptor bitmap = BitmapDescriptorFactory
+                            .fromResource(R.drawable.ic_basestation);
+                    //构建MarkerOption，用于在地图上添加Marker
+                    OverlayOptions option = new MarkerOptions()
+                            .position(point)
+                            .icon(bitmap);
+                    //在地图上添加Marker，并显示
+                    baiduMap.addOverlay(option);*/
+                }
+                mClusterManager.addItems(items);
                 /*LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
                 //构建Marker图标
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
@@ -155,7 +231,7 @@ public class StationActivity extends Activity implements View.OnClickListener {
 
     private void navigateTo(BDLocation location) {
         if (isFirstLocate) {
-            ToastUtils.showToast("nav to " + location.getAddrStr());
+            ToastUtils.showToast("当前位置" + location.getAddrStr());
             LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);

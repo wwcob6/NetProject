@@ -153,12 +153,12 @@ public class DynamicDemo extends Activity implements SensorEventListener {
 
         Button start = (Button) findViewById(R.id.buttonStart);
         Button finish = (Button) findViewById(R.id.buttonFinish);
-        Button getstation = (Button) findViewById(R.id.buttongetstation);
+        /*Button getstation = (Button) findViewById(R.id.buttongetstation);*/
         info = (TextView) findViewById(R.id.info);
         progressBarRl = (RelativeLayout) findViewById(R.id.progressBarRl);
         position = findViewById(R.id.LatandLong);
 
-        getstation.setOnClickListener(new OnClickListener() {
+        /*getstation.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 final EditText editText = new EditText(DynamicDemo.this);
@@ -175,7 +175,7 @@ public class DynamicDemo extends Activity implements SensorEventListener {
                 }).show();
 
             }
-        });
+        });*/
 
         start.setOnClickListener(new OnClickListener() {
 
