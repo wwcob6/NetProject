@@ -15,6 +15,7 @@ public class ChooseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_choose);
         SuperButton chooseMain = (SuperButton) findViewById(R.id.main_button);
         SuperButton chooseMap = (SuperButton) findViewById(R.id.map_button);
+        SuperButton chooseHistory = (SuperButton) findViewById(R.id.history_button);
         chooseMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -26,6 +27,13 @@ public class ChooseActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(ChooseActivity.this,StationActivity.class);
+                startActivity(intent);
+            }
+        });
+        chooseHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(ChooseActivity.this,HistoryActivity.class);
                 startActivity(intent);
             }
         });

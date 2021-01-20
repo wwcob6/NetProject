@@ -21,15 +21,21 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.punuo.sys.net.clusterutil.clustering.Cluster;
 import com.punuo.sys.net.clusterutil.clustering.ClusterManager;
+import com.punuo.sys.net.datepicker.CustomDatePicker;
+import com.punuo.sys.net.datepicker.DateFormatUtils;
 import com.punuo.sys.net.push.model.GetStationsModel;
+import com.punuo.sys.net.push.request.GetHistoryTrackRequest;
 import com.punuo.sys.net.push.request.GetStationsRequest;
 import com.punuo.sys.sdk.httplib.HttpManager;
 import com.punuo.sys.sdk.httplib.RequestListener;
@@ -42,13 +48,15 @@ import top.androidman.SuperButton;
 
 import static org.greenrobot.eventbus.EventBus.TAG;
 
-public class StationActivity extends Activity implements View.OnClickListener {
+public class HistoryActivity extends Activity implements View.OnClickListener {
     public LocationClient mLocationClient;
 
     private TextView positionText;
-
+    private CustomDatePicker mTimerPicker;
+    private CustomDatePicker customDatePicker1;
     private MapView mapView;
     private SuperButton superButton;
+    private SuperButton historyButton;
     private BaiduMap baiduMap;
     private ClusterManager<MyItem> mClusterManager;
     private boolean isFirstLocate = true;
@@ -58,10 +66,18 @@ public class StationActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
+        initTimerPicker();
         SDKInitializer.initialize(getApplicationContext());
-        setContentView(R.layout.activity_station);
+        setContentView(R.layout.activity_history);
         mapView = (MapView) findViewById(R.id.bmapView);
         superButton = findViewById(R.id.r_button);
+        historyButton = findViewById(R.id.set_button);
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTimerPicker.show("2018-10-17 18:00");
+            }
+        });
         superButton.setOnClickListener(this);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
@@ -97,52 +113,51 @@ public class StationActivity extends Activity implements View.OnClickListener {
         baiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
         /*positionText = (TextView) findViewById(R.id.position_text_view);*/
         List<String> permissionList = new ArrayList<>();
-        if (ContextCompat.checkSelfPermission(StationActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(HistoryActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
-        if (ContextCompat.checkSelfPermission(StationActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(HistoryActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.READ_PHONE_STATE);
         }
-        if (ContextCompat.checkSelfPermission(StationActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(HistoryActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if (!permissionList.isEmpty()) {
             String [] permissions = permissionList.toArray(new String[permissionList.size()]);
-            ActivityCompat.requestPermissions(StationActivity.this, permissions, 1);
+            ActivityCompat.requestPermissions(HistoryActivity.this, permissions, 1);
         } else {
             requestLocation();
         }
     }
 
+    private void initTimerPicker() {
+        String beginTime = "2020-10-17 18:00";
+        String endTime = DateFormatUtils.long2Str(System.currentTimeMillis(), true);
+
+        //mTvSelectedTime.setText(endTime);
+
+        // 通过日期字符串初始化日期，格式请用：yyyy-MM-dd HH:mm
+        mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
+            @Override
+            public void onTimeSelected(long timestamp) {
+                //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
+
+            }
+
+        }, beginTime, endTime);
+        // 允许点击屏幕或物理返回键关闭
+        mTimerPicker.setCancelable(true);
+        // 显示时和分
+        mTimerPicker.setCanShowPreciseTime(true);
+        // 允许循环滚动
+        mTimerPicker.setScrollLoop(true);
+        // 允许滚动动画
+        mTimerPicker.setCanShowAnim(true);
+    }
+
     private void addMarkers() {
 
     }
-
-    private void initCluster() {
-        Log.i("ww", "成功2");
-        // 定义点聚合管理类ClusterManager
-        mClusterManager = new ClusterManager<MyItem>(this,baiduMap);
-        baiduMap.setOnMapStatusChangeListener(mClusterManager);
-        baiduMap.setOnMarkerClickListener(mClusterManager);
-        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MyItem>() {
-            @Override
-            public boolean onClusterClick(Cluster<MyItem> cluster) {
-                Toast.makeText(StationActivity.this, "有" + cluster.getSize() + "个点",
-                        Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-        mClusterManager.setOnClusterItemClickListener(
-                new ClusterManager.OnClusterItemClickListener<MyItem>() {
-                    @Override
-                    public boolean onClusterItemClick(MyItem item) {
-                        Toast.makeText(StationActivity.this, "点击单个Item", Toast.LENGTH_SHORT)
-                                .show();
-                        return false;
-                    }
-                });
-    }
-
     public void showAboutDialog(LatLng latLng){
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         TextView title = new TextView(this);
@@ -168,6 +183,32 @@ public class StationActivity extends Activity implements View.OnClickListener {
         });
         dialog.show();
     }
+    private GetHistoryTrackRequest getHistoryTrackRequest;
+    public void getHistoryTrackRequest(String string){
+        if (getHistoryTrackRequest == null && !getHistoryTrackRequest.isFinished) return;
+        getHistoryTrackRequest = new GetHistoryTrackRequest();
+        getHistoryTrackRequest.addUrlParam("time", string);
+        getHistoryTrackRequest.setRequestListener(new RequestListener() {
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onSuccess(Object result) {
+                if (result == null) {
+                    return;
+                }
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+        HttpManager.addRequest(getHistoryTrackRequest);
+    }
     private GetStationsRequest getStationsRequest;
     public void getStationsLocation (double latitude, double
             longitude){
@@ -189,32 +230,31 @@ public class StationActivity extends Activity implements View.OnClickListener {
                 if (result == null) {
                     return;
                 }
-                initCluster();
                 for (int i = 0; i <  result.stationsList.size(); i++) {
                     LatLng point = new LatLng(result.stationsList.get(i).latitude, result.stationsList.get(i).longitude);
                     items.add(new MyItem(point));
                     Log.i("ww", "onSuccess: "+i);
                     //构建Marker图标
-                    /*BitmapDescriptor bitmap = BitmapDescriptorFactory
+                    BitmapDescriptor bitmap = BitmapDescriptorFactory
                             .fromResource(R.drawable.ic_basestation);
                     //构建MarkerOption，用于在地图上添加Marker
                     OverlayOptions option = new MarkerOptions()
                             .position(point)
                             .icon(bitmap);
                     //在地图上添加Marker，并显示
-                    baiduMap.addOverlay(option);*/
+                    baiduMap.addOverlay(option);
                 }
-                mClusterManager.addItems(items);
-                /*LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
-                //构建Marker图标
-                BitmapDescriptor bitmap = BitmapDescriptorFactory
-                        .fromResource(R.drawable.ic_basestation);
-                //构建MarkerOption，用于在地图上添加Marker
-                OverlayOptions option = new MarkerOptions()
-                        .position(point)
-                        .icon(bitmap);
-                //在地图上添加Marker，并显示
-                baiduMap.addOverlay(option);*/
+//                mClusterManager.addItems(items);
+//                LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
+//                //构建Marker图标
+//                BitmapDescriptor bitmap = BitmapDescriptorFactory
+//                        .fromResource(R.drawable.ic_basestation);
+//                //构建MarkerOption，用于在地图上添加Marker
+//                OverlayOptions option = new MarkerOptions()
+//                        .position(point)
+//                        .icon(bitmap);
+//                //在地图上添加Marker，并显示
+//                baiduMap.addOverlay(option);
             }
 
             @Override
@@ -301,7 +341,7 @@ public class StationActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(StationActivity.this,ChooseActivity.class);
+        Intent intent = new Intent(HistoryActivity.this,ChooseActivity.class);
         startActivity(intent);
     }
 

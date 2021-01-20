@@ -2,9 +2,7 @@ package com.punuo.sys.net;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,11 +13,9 @@ import android.support.v4.app.ActivityCompat;
 import android.telephony.CellIdentityNr;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoNr;
-import android.telephony.CellSignalStrengthNr;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,10 +37,10 @@ import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
-import com.punuo.sys.net.push.GetStationLocationRequest;
-import com.punuo.sys.net.push.ProcessTasks;
-import com.punuo.sys.net.push.getstationlocationmodel;
-import com.punuo.sys.sdk.PnApplication;
+import com.punuo.sys.net.datepicker.CustomDatePicker;
+import com.punuo.sys.net.datepicker.DateFormatUtils;
+import com.punuo.sys.net.push.request.GetStationLocationRequest;
+import com.punuo.sys.net.push.model.getstationlocationmodel;
 import com.punuo.sys.sdk.httplib.HttpManager;
 import com.punuo.sys.sdk.httplib.RequestListener;
 
@@ -60,7 +56,7 @@ public class Pci extends Activity implements SensorEventListener {
     private double mCurrentLat = 0.0;
     private double mCurrentLon = 0.0;
     private float mCurrentAccracy;
-
+    private CustomDatePicker mTimerPicker;
     MapView mMapView;
     BaiduMap mBaiduMap;
 
@@ -96,7 +92,7 @@ public class Pci extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_pci);
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         initView();
-
+        initTimerPicker();
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);// 获取传感器管理服务
 
         // 地图初始化
@@ -149,11 +145,34 @@ public class Pci extends Activity implements SensorEventListener {
         mLocClient.start();
     }
 
+    private void initTimerPicker() {
+        String beginTime = "2020-10-17 18:00";
+        String endTime = DateFormatUtils.long2Str(System.currentTimeMillis(), true);
+
+        //mTvSelectedTime.setText(endTime);
+
+        // 通过日期字符串初始化日期，格式请用：yyyy-MM-dd HH:mm
+        mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
+            @Override
+            public void onTimeSelected(long timestamp) {
+                //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
+            }
+        }, beginTime, endTime);
+        // 允许点击屏幕或物理返回键关闭
+        mTimerPicker.setCancelable(true);
+        // 显示时和分
+        mTimerPicker.setCanShowPreciseTime(true);
+        // 允许循环滚动
+        mTimerPicker.setScrollLoop(true);
+        // 允许滚动动画
+        mTimerPicker.setCanShowAnim(true);
+    }
+
     private void initView() {
 
         Button start = (Button) findViewById(R.id.buttonStart);
         Button finish = (Button) findViewById(R.id.buttonFinish);
-        /*Button getstation = (Button) findViewById(R.id.buttongetstation);*/
+        Button getstation = (Button) findViewById(R.id.buttongetstation);
         info = (TextView) findViewById(R.id.info);
         progressBarRl = (RelativeLayout) findViewById(R.id.progressBarRl);
         position = findViewById(R.id.LatandLong);
@@ -185,24 +204,25 @@ public class Pci extends Activity implements SensorEventListener {
             }
         }
 
-        /*getstation.setOnClickListener(new View.OnClickListener() {
+        getstation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final EditText editText = new EditText(Pci.this);
-                new AlertDialog.Builder(Pci.this).setTitle("请输入基站ID").setView(editText).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                /*final EditText editText = new EditText(Pci.this);
+                new AlertDialog.Builder(Pci.this).setTitle("请输入日期以及时间(2020/2/21 20:00)").setView(editText).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        getStationLocation(editText.getText().toString());
+                        //TimePickerDialog
+                        //getStationLocation(editText.getText().toString());
                     }
                 }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         return;
                     }
-                }).show();
-
+                }).show();*/
+                mTimerPicker.show("2018-10-17 18:00");
             }
-        });*/
+        });
 
         start.setOnClickListener(new View.OnClickListener() {
 

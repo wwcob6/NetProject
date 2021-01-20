@@ -1,4 +1,4 @@
-package com.punuo.sys.net.push;
+package com.punuo.sys.net.push.model;
 
 import com.google.gson.annotations.SerializedName;
 import com.punuo.sys.sdk.model.BaseModel;

@@ -1,26 +1,14 @@
 package com.punuo.sys.net;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.TrafficStats;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoNr;
-import android.telephony.CellSignalStrengthNr;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,10 +30,8 @@ import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
-import com.punuo.sys.net.push.GetStationLocationRequest;
-import com.punuo.sys.net.push.ProcessTasks;
-import com.punuo.sys.net.push.getstationlocationmodel;
-import com.punuo.sys.sdk.PnApplication;
+import com.punuo.sys.net.push.request.GetStationLocationRequest;
+import com.punuo.sys.net.push.model.getstationlocationmodel;
 import com.punuo.sys.sdk.httplib.HttpManager;
 import com.punuo.sys.sdk.httplib.RequestListener;
 

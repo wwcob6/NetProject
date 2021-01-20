@@ -12,7 +12,6 @@ import android.net.TrafficStats;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -24,9 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.CellIdentityNr;
 import android.telephony.CellInfo;
-import android.telephony.CellInfoLte;
 import android.telephony.CellInfoNr;
-import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthNr;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
@@ -42,20 +39,18 @@ import com.punuo.sys.net.adapter.DataAdapter;
 import com.punuo.sys.net.delay.BadNetworkCase;
 import com.punuo.sys.net.delay.DxNetworkUtil;
 import com.punuo.sys.net.push.Constant;
-import com.punuo.sys.net.push.PushRequest;
+import com.punuo.sys.net.push.request.PushRequest;
 
 import android.widget.Toast;
 
 import com.baidu.mapapi.SDKInitializer;
-import com.punuo.sys.net.push.ProcessTasks;
 
-import com.punuo.sys.sdk.PnApplication;
 import com.punuo.sys.sdk.activity.BaseActivity;
 import com.punuo.sys.sdk.httplib.HttpManager;
 import com.punuo.sys.sdk.httplib.RequestListener;
 import com.punuo.sys.sdk.model.BaseModel;
 import com.punuo.sys.sdk.util.ToastUtils;
-import com.punuo.sys.net.push.ProcessTasks;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
