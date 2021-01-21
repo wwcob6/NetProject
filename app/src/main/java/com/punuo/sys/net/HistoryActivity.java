@@ -34,6 +34,7 @@ import com.baidu.mapapi.model.LatLng;
 import com.punuo.sys.net.clusterutil.clustering.ClusterManager;
 import com.punuo.sys.net.datepicker.CustomDatePicker;
 import com.punuo.sys.net.datepicker.DateFormatUtils;
+import com.punuo.sys.net.push.model.GetHistoryTrackModel;
 import com.punuo.sys.net.push.model.GetStationsModel;
 import com.punuo.sys.net.push.request.GetHistoryTrackRequest;
 import com.punuo.sys.net.push.request.GetStationsRequest;
@@ -142,6 +143,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
             public void onTimeSelected(long timestamp, String string) {
                 //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
                 Log.i("nono", DateFormatUtils.long2Str(timestamp, true) + "和" + string);
+                getHistoryTrackRequest(DateFormatUtils.long2Str(timestamp, true), string);
             }
         }, beginTime, endTime);
         // 允许点击屏幕或物理返回键关闭
@@ -183,22 +185,36 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
         dialog.show();
     }
     private GetHistoryTrackRequest getHistoryTrackRequest;
-    public void getHistoryTrackRequest(String string){
+    public void getHistoryTrackRequest(String date, String string){
         if (getHistoryTrackRequest == null && !getHistoryTrackRequest.isFinished) return;
         getHistoryTrackRequest = new GetHistoryTrackRequest();
-        getHistoryTrackRequest.addUrlParam("time", string);
-        getHistoryTrackRequest.setRequestListener(new RequestListener() {
+        getHistoryTrackRequest.addUrlParam("time", date);
+        getHistoryTrackRequest.addUrlParam("para",string);
+        getHistoryTrackRequest.setRequestListener(new RequestListener<GetHistoryTrackModel>() {
             @Override
             public void onComplete() {
 
             }
 
             @Override
-            public void onSuccess(Object result) {
+            public void onSuccess(GetHistoryTrackModel result) {
                 if (result == null) {
                     return;
                 }
-
+                for (int i = 0; i <  result.locationsList.size(); i++) {
+                    LatLng point = new LatLng(result.locationsList.get(i).latitude, result.locationsList.get(i).longitude);
+                    items.add(new MyItem(point));
+                    Log.i("ww", "onSuccess: "+i);
+                    //构建Marker图标
+                    BitmapDescriptor bitmap = BitmapDescriptorFactory
+                            .fromResource(R.drawable.ic_basestation);
+                    //构建MarkerOption，用于在地图上添加Marker
+                    OverlayOptions option = new MarkerOptions()
+                            .position(point)
+                            .icon(bitmap);
+                    //在地图上添加Marker，并显示
+                    baiduMap.addOverlay(option);
+                }
             }
 
             @Override

@@ -161,24 +161,23 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
     @Override
     public void onSelect(View view, String selected) {
         if (view == null || TextUtils.isEmpty(selected)) return;
-        Log.i("nono", "onSelect: "+ selected);
+        if (selected.equals("PCI") || selected.equals("RSRP") || selected.equals("UL") || selected.equals("DL") || selected.equals("SINR")){
+            targetPara = selected;
+        }
         int timeUnit;
         try {
             timeUnit = Integer.parseInt(selected);
-            targetPara = selected;
         } catch (Throwable ignored) {
             return;
         }
 
         switch (view.getId()) {
             case R.id.dpv_year:
-                Log.d("nono", "onSelect: 1");
                 mSelectedTime.set(Calendar.YEAR, timeUnit);
                 linkageMonthUnit(true, LINKAGE_DELAY_DEFAULT);
                 break;
 
             case R.id.dpv_month:
-                Log.d("nono", "onSelect: 2");
                 // 防止类似 2018/12/31 滚动到11月时因溢出变成 2018/12/01
                 int lastSelectedMonth = mSelectedTime.get(Calendar.MONTH) + 1;
                 mSelectedTime.add(Calendar.MONTH, timeUnit - lastSelectedMonth);
@@ -186,24 +185,21 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
                 break;
 
             case R.id.dpv_day:
-                Log.d("nono", "onSelect: 3");
                 mSelectedTime.set(Calendar.DAY_OF_MONTH, timeUnit);
                 linkageHourUnit(true, LINKAGE_DELAY_DEFAULT);
                 break;
 
             case R.id.dpv_hour:
-                Log.d("nono", "onSelect: 4");
                 mSelectedTime.set(Calendar.HOUR_OF_DAY, timeUnit);
                 linkageMinuteUnit(true);
                 break;
 
             case R.id.dpv_minute:
-                Log.d("nono", "onSelect: ");
                 mSelectedTime.set(Calendar.MINUTE, timeUnit);
                 break;
             case R.id.dpv_para:
-                Log.i("nono", "onSelect: "+ selected);
-                Log.i("nono", "onSelect: targetPara = "+targetPara);
+                //Log.i("nono", "onSelect: "+ selected);
+                Log.d("nono", "onSelect: targetPara = "+mParaUnits.get(0));
                 break;
         }
     }

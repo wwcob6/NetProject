@@ -9,5 +9,6 @@ public class Locations {
     @SerializedName("lat")
     public double latitude;
 
-
+    @SerializedName("paraData")
+    public int paraData;
 }
