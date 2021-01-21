@@ -12,6 +12,7 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -25,10 +26,6 @@ import java.util.TimerTask;
 
 /**
  * 说明：内容选择器，例如年月日、省市区等
- * 作者：liuwan1992
- * 添加时间：2016/9/28
- * 修改人：liuwan1992
- * 修改时间：2018/12/21
  */
 public class PickerView extends View {
 
@@ -269,6 +266,7 @@ public class PickerView extends View {
 
                 if (mOnSelectListener != null && mSelectedIndex < mDataList.size()) {
                     mOnSelectListener.onSelect(this, mDataList.get(mSelectedIndex));
+                    Log.i("haha", String.valueOf(mSelectedIndex));
                 }
             }
         } else if (mScrollDistance > 0) {

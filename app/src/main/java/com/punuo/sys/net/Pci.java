@@ -14,6 +14,7 @@ import android.telephony.CellIdentityNr;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoNr;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -152,12 +153,13 @@ public class Pci extends Activity implements SensorEventListener {
         //mTvSelectedTime.setText(endTime);
 
         // 通过日期字符串初始化日期，格式请用：yyyy-MM-dd HH:mm
-        mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
+        /*mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
             @Override
             public void onTimeSelected(long timestamp) {
                 //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
+                Log.i("时间",DateFormatUtils.long2Str(timestamp, true));
             }
-        }, beginTime, endTime);
+        }, beginTime, endTime);*/
         // 允许点击屏幕或物理返回键关闭
         mTimerPicker.setCancelable(true);
         // 显示时和分
@@ -172,7 +174,7 @@ public class Pci extends Activity implements SensorEventListener {
 
         Button start = (Button) findViewById(R.id.buttonStart);
         Button finish = (Button) findViewById(R.id.buttonFinish);
-        Button getstation = (Button) findViewById(R.id.buttongetstation);
+        //Button getstation = (Button) findViewById(R.id.buttongetstation);
         info = (TextView) findViewById(R.id.info);
         progressBarRl = (RelativeLayout) findViewById(R.id.progressBarRl);
         position = findViewById(R.id.LatandLong);
@@ -204,10 +206,10 @@ public class Pci extends Activity implements SensorEventListener {
             }
         }
 
-        getstation.setOnClickListener(new View.OnClickListener() {
+        /*getstation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*final EditText editText = new EditText(Pci.this);
+                *//*final EditText editText = new EditText(Pci.this);
                 new AlertDialog.Builder(Pci.this).setTitle("请输入日期以及时间(2020/2/21 20:00)").setView(editText).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -219,10 +221,10 @@ public class Pci extends Activity implements SensorEventListener {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         return;
                     }
-                }).show();*/
+                }).show();*//*
                 mTimerPicker.show("2018-10-17 18:00");
             }
-        });
+        });*/
 
         start.setOnClickListener(new View.OnClickListener() {
 

@@ -3,6 +3,7 @@ package com.punuo.sys.net.datepicker;
 import android.app.Dialog;
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -18,10 +19,6 @@ import java.util.List;
 
 /**
  * 说明：自定义时间选择器
- * 作者：liuwan1992
- * 添加时间：2016/9/28
- * 修改人：liuwan1992
- * 修改时间：2018/12/21
  */
 public class CustomDatePicker implements View.OnClickListener, PickerView.OnSelectListener {
 
@@ -31,13 +28,14 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
     private boolean mCanDialogShow;
 
     private Dialog mPickerDialog;
-    private PickerView mDpvYear, mDpvMonth, mDpvDay, mDpvHour, mDpvMinute;
-    private TextView mTvHourUnit, mTvMinuteUnit;
+    private PickerView mDpvYear, mDpvMonth, mDpvDay, mDpvHour, mDpvMinute, mDpvPara;
+    private TextView mTvHourUnit, mTvMinuteUnit, mTvParaUnit;
 
     private int mBeginYear, mBeginMonth, mBeginDay, mBeginHour, mBeginMinute,
             mEndYear, mEndMonth, mEndDay, mEndHour, mEndMinute;
+    private String mBeginPara, mEndPara, targetPara;
     private List<String> mYearUnits = new ArrayList<>(), mMonthUnits = new ArrayList<>(), mDayUnits = new ArrayList<>(),
-            mHourUnits = new ArrayList<>(), mMinuteUnits = new ArrayList<>();
+            mHourUnits = new ArrayList<>(), mMinuteUnits = new ArrayList<>(), mParaUnits = new ArrayList<>();
     private DecimalFormat mDecimalFormat = new DecimalFormat("00");
 
     private boolean mCanShowPreciseTime;
@@ -65,7 +63,7 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
      * 时间选择结果回调接口
      */
     public interface Callback {
-        void onTimeSelected(long timestamp);
+        void onTimeSelected(long timestamp,String string);
     }
 
     /**
@@ -127,6 +125,7 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
         mTvHourUnit = mPickerDialog.findViewById(R.id.tv_hour_unit);
         mTvMinuteUnit = mPickerDialog.findViewById(R.id.tv_minute_unit);
 
+
         mDpvYear = mPickerDialog.findViewById(R.id.dpv_year);
         mDpvYear.setOnSelectListener(this);
         mDpvMonth = mPickerDialog.findViewById(R.id.dpv_month);
@@ -137,6 +136,8 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
         mDpvHour.setOnSelectListener(this);
         mDpvMinute = mPickerDialog.findViewById(R.id.dpv_minute);
         mDpvMinute.setOnSelectListener(this);
+        mDpvPara = mPickerDialog.findViewById(R.id.dpv_para);
+        mDpvPara.setOnSelectListener(this);
     }
 
     @Override
@@ -147,7 +148,7 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
 
             case R.id.tv_confirm:
                 if (mCallback != null) {
-                    mCallback.onTimeSelected(mSelectedTime.getTimeInMillis());
+                    mCallback.onTimeSelected(mSelectedTime.getTimeInMillis(),targetPara);
                 }
                 break;
         }
@@ -160,21 +161,24 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
     @Override
     public void onSelect(View view, String selected) {
         if (view == null || TextUtils.isEmpty(selected)) return;
-
+        Log.i("nono", "onSelect: "+ selected);
         int timeUnit;
         try {
             timeUnit = Integer.parseInt(selected);
+            targetPara = selected;
         } catch (Throwable ignored) {
             return;
         }
 
         switch (view.getId()) {
             case R.id.dpv_year:
+                Log.d("nono", "onSelect: 1");
                 mSelectedTime.set(Calendar.YEAR, timeUnit);
                 linkageMonthUnit(true, LINKAGE_DELAY_DEFAULT);
                 break;
 
             case R.id.dpv_month:
+                Log.d("nono", "onSelect: 2");
                 // 防止类似 2018/12/31 滚动到11月时因溢出变成 2018/12/01
                 int lastSelectedMonth = mSelectedTime.get(Calendar.MONTH) + 1;
                 mSelectedTime.add(Calendar.MONTH, timeUnit - lastSelectedMonth);
@@ -182,17 +186,24 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
                 break;
 
             case R.id.dpv_day:
+                Log.d("nono", "onSelect: 3");
                 mSelectedTime.set(Calendar.DAY_OF_MONTH, timeUnit);
                 linkageHourUnit(true, LINKAGE_DELAY_DEFAULT);
                 break;
 
             case R.id.dpv_hour:
+                Log.d("nono", "onSelect: 4");
                 mSelectedTime.set(Calendar.HOUR_OF_DAY, timeUnit);
                 linkageMinuteUnit(true);
                 break;
 
             case R.id.dpv_minute:
+                Log.d("nono", "onSelect: ");
                 mSelectedTime.set(Calendar.MINUTE, timeUnit);
+                break;
+            case R.id.dpv_para:
+                Log.i("nono", "onSelect: "+ selected);
+                Log.i("nono", "onSelect: targetPara = "+targetPara);
                 break;
         }
     }
@@ -206,32 +217,37 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
         mBeginDay = mBeginTime.get(Calendar.DAY_OF_MONTH);
         mBeginHour = mBeginTime.get(Calendar.HOUR_OF_DAY);
         mBeginMinute = mBeginTime.get(Calendar.MINUTE);
+        mBeginPara = "RSRP";
 
         mEndYear = mEndTime.get(Calendar.YEAR);
         mEndMonth = mEndTime.get(Calendar.MONTH) + 1;
         mEndDay = mEndTime.get(Calendar.DAY_OF_MONTH);
         mEndHour = mEndTime.get(Calendar.HOUR_OF_DAY);
         mEndMinute = mEndTime.get(Calendar.MINUTE);
+        mEndPara = "PCI";
 
         boolean canSpanYear = mBeginYear != mEndYear;
         boolean canSpanMon = !canSpanYear && mBeginMonth != mEndMonth;
         boolean canSpanDay = !canSpanMon && mBeginDay != mEndDay;
         boolean canSpanHour = !canSpanDay && mBeginHour != mEndHour;
         boolean canSpanMinute = !canSpanHour && mBeginMinute != mEndMinute;
+        boolean canSpanPara = !canSpanMinute && mBeginPara != mEndPara;
         if (canSpanYear) {
-            initDateUnits(MAX_MONTH_UNIT, mBeginTime.getActualMaximum(Calendar.DAY_OF_MONTH), MAX_HOUR_UNIT, MAX_MINUTE_UNIT);
+            initDateUnits(MAX_MONTH_UNIT, mBeginTime.getActualMaximum(Calendar.DAY_OF_MONTH), MAX_HOUR_UNIT, MAX_MINUTE_UNIT,mEndPara);
         } else if (canSpanMon) {
-            initDateUnits(mEndMonth, mBeginTime.getActualMaximum(Calendar.DAY_OF_MONTH), MAX_HOUR_UNIT, MAX_MINUTE_UNIT);
+            initDateUnits(mEndMonth, mBeginTime.getActualMaximum(Calendar.DAY_OF_MONTH), MAX_HOUR_UNIT, MAX_MINUTE_UNIT,mEndPara);
         } else if (canSpanDay) {
-            initDateUnits(mEndMonth, mEndDay, MAX_HOUR_UNIT, MAX_MINUTE_UNIT);
+            initDateUnits(mEndMonth, mEndDay, MAX_HOUR_UNIT, MAX_MINUTE_UNIT, mEndPara);
         } else if (canSpanHour) {
-            initDateUnits(mEndMonth, mEndDay, mEndHour, MAX_MINUTE_UNIT);
+            initDateUnits(mEndMonth, mEndDay, mEndHour, MAX_MINUTE_UNIT, mEndPara);
         } else if (canSpanMinute) {
-            initDateUnits(mEndMonth, mEndDay, mEndHour, mEndMinute);
+            initDateUnits(mEndMonth, mEndDay, mEndHour, mEndMinute, mEndPara);
+        } else if (canSpanPara){
+            initDateUnits(mEndMonth, mEndDay, mEndHour, mEndMinute, mEndPara);
         }
     }
 
-    private void initDateUnits(int endMonth, int endDay, int endHour, int endMinute) {
+    private void initDateUnits(int endMonth, int endDay, int endHour, int endMinute, String endPara) {
         for (int i = mBeginYear; i <= mEndYear; i++) {
             mYearUnits.add(String.valueOf(i));
         }
@@ -259,7 +275,11 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
                 mMinuteUnits.add(mDecimalFormat.format(i));
             }
         }
-
+        mParaUnits.add("RSRP");
+        mParaUnits.add("UL");
+        mParaUnits.add("DL");
+        mParaUnits.add("SINR");
+        mParaUnits.add("PCI");
         mDpvYear.setDataList(mYearUnits);
         mDpvYear.setSelected(0);
         mDpvMonth.setDataList(mMonthUnits);
@@ -270,7 +290,8 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
         mDpvHour.setSelected(0);
         mDpvMinute.setDataList(mMinuteUnits);
         mDpvMinute.setSelected(0);
-
+        mDpvPara.setDataList(mParaUnits);
+        mDpvPara.setSelected(0);
         setCanScroll();
     }
 
@@ -280,6 +301,7 @@ public class CustomDatePicker implements View.OnClickListener, PickerView.OnSele
         mDpvDay.setCanScroll(mDayUnits.size() > 1);
         mDpvHour.setCanScroll(mHourUnits.size() > 1 && (mScrollUnits & SCROLL_UNIT_HOUR) == SCROLL_UNIT_HOUR);
         mDpvMinute.setCanScroll(mMinuteUnits.size() > 1 && (mScrollUnits & SCROLL_UNIT_MINUTE) == SCROLL_UNIT_MINUTE);
+        mDpvPara.setCanScroll(true);
     }
 
     /**

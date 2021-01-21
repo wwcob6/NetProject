@@ -19,14 +19,14 @@
         android:layout_marginTop="10dip"
         android:text="开始" />
 
-    <Button
+    <!--<Button
         android:id="@+id/buttongetstation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dip"
-        android:text="查看历史数据" />
+        android:text="查看历史数据" />-->
 
     <Button
         android:id="@+id/buttonFinish"

@@ -139,11 +139,10 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
         // 通过日期字符串初始化日期，格式请用：yyyy-MM-dd HH:mm
         mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
             @Override
-            public void onTimeSelected(long timestamp) {
+            public void onTimeSelected(long timestamp, String string) {
                 //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
-
+                Log.i("nono", DateFormatUtils.long2Str(timestamp, true) + "和" + string);
             }
-
         }, beginTime, endTime);
         // 允许点击屏幕或物理返回键关闭
         mTimerPicker.setCancelable(true);
