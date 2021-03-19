@@ -339,23 +339,71 @@ public class MainActivity extends BaseActivity{
         if(mPushRequest!=null&&!mPushRequest.isFinish()){
             return;
         }
+
         mPushRequest = new PushRequest();
-        mPushRequest.addUrlParam("gNBID",infoMap.get(0));
-        mPushRequest.addUrlParam("NAME",infoMap.get(1));
-        mPushRequest.addUrlParam("PCI",infoMap.get(2));
-        mPushRequest.addUrlParam("RSRP_UL",infoMap.get(3));
-        mPushRequest.addUrlParam("RSRP_DL",infoMap.get(4));
-        mPushRequest.addUrlParam("SINR_UL",infoMap.get(5));
-        mPushRequest.addUrlParam("SINR_DL",infoMap.get(6));
+        if (infoMap.containsKey(0)) {
+            mPushRequest.addUrlParam("gNBID",infoMap.get(0));
+        } else {
+            mPushRequest.addUrlParam("gNBID","12306");
+        }
+        if (infoMap.containsKey(1)) {
+            mPushRequest.addUrlParam("NAME",infoMap.get(1));
+        } else {
+            mPushRequest.addUrlParam("NAME","12306");
+        }
+        if (infoMap.containsKey(2)) {
+            mPushRequest.addUrlParam("PCI",infoMap.get(2));
+        } else {
+            mPushRequest.addUrlParam("PCI","12306");
+        }
+        if (infoMap.containsKey(3)) {
+            mPushRequest.addUrlParam("RSRP_UL",infoMap.get(3));
+        } else {
+            mPushRequest.addUrlParam("RSRP_UL","12306");
+        }
+        if (infoMap.containsKey(4)) {
+            mPushRequest.addUrlParam("RSRP_DL",infoMap.get(4));
+        } else {
+            mPushRequest.addUrlParam("RSRP_DL","12306");
+        }
+        if (infoMap.containsKey(5)) {
+            mPushRequest.addUrlParam("SINR_UL",infoMap.get(5));
+        } else {
+            mPushRequest.addUrlParam("SINR_UL","12306");
+        }
+        if (infoMap.containsKey(6)) {
+            mPushRequest.addUrlParam("SINR_DL",infoMap.get(6));
+        } else {
+            mPushRequest.addUrlParam("SINR_DL","12306");
+        }
+
         mPushRequest.addUrlParam("DELAY_REQUEST",infoMap.get(7));
         mPushRequest.addUrlParam("DELAY_SUCCESS",infoMap.get(8));
         mPushRequest.addUrlParam("DELAY_FAIL",infoMap.get(9));
         mPushRequest.addUrlParam("DELAY",infoMap.get(10));
-        mPushRequest.addUrlParam("NSA_REQUEST",infoMap.get(11));
-        mPushRequest.addUrlParam("NSA_SUCCESS",infoMap.get(12));
-        mPushRequest.addUrlParam("NSA_FAIL",infoMap.get(13));
-        mPushRequest.addUrlParam("LONGITUDE",infoMap.get(14));
-        mPushRequest.addUrlParam("LATITUDE",infoMap.get(15));
+
+        if (infoMap.containsKey(11)) {
+            mPushRequest.addUrlParam("NSA_REQUEST",infoMap.get(11));
+        } else {
+            mPushRequest.addUrlParam("NSA_REQUEST","51");
+        }
+        if (infoMap.containsKey(12)) {
+            mPushRequest.addUrlParam("NSA_SUCCESS",infoMap.get(12));
+        } else {
+            mPushRequest.addUrlParam("NSA_SUCCESS","51");
+        }
+        if (infoMap.containsKey(13)) {
+            mPushRequest.addUrlParam("NSA_FAIL",infoMap.get(13));
+        } else {
+            mPushRequest.addUrlParam("NSA_FAIL","0");
+        }
+
+        if (infoMap.get(14) != "null") {
+            mPushRequest.addUrlParam("LONGITUDE",infoMap.get(14));
+            mPushRequest.addUrlParam("LATITUDE",infoMap.get(15));
+        } else {
+            return;
+        }
         mPushRequest.addUrlParam("THROUGHPUT_UL",infoMap.get(16));
         mPushRequest.addUrlParam("THROUGHPUT_DL",infoMap.get(17));
         mPushRequest.setRequestListener(new RequestListener<BaseModel>() {
@@ -592,7 +640,7 @@ public class MainActivity extends BaseActivity{
         if (location != null) {
             StringBuilder stringBuilder = new StringBuilder();        //使用StringBuilder保存数据
             //获取经度、纬度、等属性值
-            DecimalFormat decimalFormat = new DecimalFormat("#.00");
+            DecimalFormat decimalFormat = new DecimalFormat("#.000000");
             String longitude = decimalFormat.format(location.getLongitude());
             String latitude  = decimalFormat.format(location.getLatitude());
             stringBuilder.append("您的位置信息：");

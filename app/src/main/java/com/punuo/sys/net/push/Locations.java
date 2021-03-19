@@ -3,12 +3,12 @@ package com.punuo.sys.net.push;
 import com.google.gson.annotations.SerializedName;
 
 public class Locations {
-    @SerializedName("lng")
+    @SerializedName("LONGITUDE")
     public double longitude;
 
-    @SerializedName("lat")
+    @SerializedName("LATITUDE")
     public double latitude;
 
-    @SerializedName("paraData")
+    @SerializedName("Data")
     public int paraData;
 }

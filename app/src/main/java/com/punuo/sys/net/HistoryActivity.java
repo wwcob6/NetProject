@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -29,7 +30,9 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.punuo.sys.net.clusterutil.clustering.ClusterManager;
 import com.punuo.sys.net.datepicker.CustomDatePicker;
@@ -132,7 +135,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
     }
 
     private void initTimerPicker() {
-        String beginTime = "2020-10-17 18:00";
+        String beginTime = "2021-1-1 18:00";
         String endTime = DateFormatUtils.long2Str(System.currentTimeMillis(), true);
 
         //mTvSelectedTime.setText(endTime);
@@ -141,6 +144,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
         mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
             @Override
             public void onTimeSelected(long timestamp, String string) {
+                if (string == null) string = "RSRP";
                 //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
                 Log.i("nono", DateFormatUtils.long2Str(timestamp, true) + "和" + string);
                 getHistoryTrackRequest(DateFormatUtils.long2Str(timestamp, true), string);
@@ -155,6 +159,8 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
         // 允许滚动动画
         mTimerPicker.setCanShowAnim(true);
     }
+
+
 
     private void addMarkers() {
 
@@ -185,11 +191,26 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
         dialog.show();
     }
     private GetHistoryTrackRequest getHistoryTrackRequest;
-    public void getHistoryTrackRequest(String date, String string){
-        if (getHistoryTrackRequest == null && !getHistoryTrackRequest.isFinished) return;
+    public void getHistoryTrackRequest(String time, String theme){
+        if (getHistoryTrackRequest != null && !getHistoryTrackRequest.isFinished) return;
+
         getHistoryTrackRequest = new GetHistoryTrackRequest();
-        getHistoryTrackRequest.addUrlParam("time", date);
-        getHistoryTrackRequest.addUrlParam("para",string);
+
+
+        if (theme.equals("RSRP")){
+            getHistoryTrackRequest.addUrlParam("Theme", "RSRP_UL");
+        } else if (theme.equals("SINR")){
+            getHistoryTrackRequest.addUrlParam("Theme", "SINR_UL");
+        }else if (theme.equals("UL")){
+            getHistoryTrackRequest.addUrlParam("Theme", "THROUGHPUT_UL");
+        }
+        else if (theme.equals("DL")){
+            getHistoryTrackRequest.addUrlParam("Theme", "THROUGHPUT_DL");
+        }else {
+            getHistoryTrackRequest.addUrlParam("Theme", "PCI");
+        }
+        getHistoryTrackRequest.addUrlParam("Time", time);
+
         getHistoryTrackRequest.setRequestListener(new RequestListener<GetHistoryTrackModel>() {
             @Override
             public void onComplete() {
@@ -198,10 +219,106 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onSuccess(GetHistoryTrackModel result) {
-                if (result == null) {
-                    return;
+                if (result == null) return;
+                Log.i("Result", "????????");
+                //构建折线点坐标
+                List<LatLng> points = new ArrayList<LatLng>();
+                /*points.add(new LatLng(39.965,116.404));
+                points.add(new LatLng(39.925,116.454));
+                points.add(new LatLng(39.955,116.494));
+                points.add(new LatLng(39.905,116.554));
+                points.add(new LatLng(39.965,116.604));
+
+                List<Integer> colors = new ArrayList<>();
+                colors.add(Integer.valueOf(Color.BLUE));
+                colors.add(Integer.valueOf(Color.RED));
+                colors.add(Integer.valueOf(Color.YELLOW));
+                colors.add(Integer.valueOf(Color.GREEN));
+
+//设置折线的属性
+                OverlayOptions mOverlayOptions = new PolylineOptions()
+                        .width(10)
+                        .color(0xAAFF0000)
+                        .points(points)
+                        .colorsValues(colors);//设置每段折线的颜色
+
+//在地图上绘制折线
+//mPloyline 折线对象
+                Overlay mPolyline = baiduMap.addOverlay(mOverlayOptions);*/
+                for (int i = 0; i < result.locationsList.size(); i++) {
+                    LatLng point = new LatLng(result.locationsList.get(i).latitude, result.locationsList.get(i).longitude);
+                    points.add(point);
+                    Log.i(TAG, "onSuccess: 坐标"+ point);
                 }
-                for (int i = 0; i <  result.locationsList.size(); i++) {
+                List<Integer> colors = new ArrayList<>();
+                for (int i = 1; i < result.locationsList.size(); i++) {
+                    //colors.add(Integer.valueOf(Color.RED));
+                    switch (theme){
+                        case "RSRP":
+                            if (result.locationsList.get(i).paraData >-95){
+                                colors.add(Integer.valueOf(Color.GREEN));
+                            } else if (result.locationsList.get(i).paraData > -105 && result.locationsList.get(i).paraData <-95){
+                                colors.add(Integer.valueOf(Color.YELLOW));
+                            } else {
+                                colors.add(Integer.valueOf(Color.RED));
+                            }
+                            break;
+                        case "SNIR":
+                            if (result.locationsList.get(i).paraData > 16){
+                                colors.add(Integer.valueOf(Color.GREEN));
+                            } else if (result.locationsList.get(i).paraData > 3 && result.locationsList.get(i).paraData < 16){
+                                colors.add(Integer.valueOf(Color.YELLOW));
+                            } else {
+                                colors.add(Integer.valueOf(Color.RED));
+                            }
+                            break;
+                        case "UL":
+                            if (result.locationsList.get(i).paraData > 40){
+                                colors.add(Integer.valueOf(Color.GREEN));
+                            } else if (result.locationsList.get(i).paraData > 20 && result.locationsList.get(i).paraData < 40){
+                                colors.add(Integer.valueOf(Color.YELLOW));
+                            } else {
+                                colors.add(Integer.valueOf(Color.RED));
+                            }
+                            break;
+                        case "DL":
+                            if (result.locationsList.get(i).paraData > 600){
+                                colors.add(Integer.valueOf(Color.GREEN));
+                            } else if (result.locationsList.get(i).paraData > 400 && result.locationsList.get(i).paraData < 600){
+                                colors.add(Integer.valueOf(Color.YELLOW));
+                            } else {
+                                colors.add(Integer.valueOf(Color.RED));
+                            }
+                            break;
+                        default:
+                            colors.add(Integer.valueOf(Color.RED));
+                    }
+                }
+                OverlayOptions mOverlayOptions = new PolylineOptions()
+                        .width(10)
+                        .color(0xAAFF0000)
+                        .points(points)
+                        .colorsValues(colors);
+                Overlay mPolyline = baiduMap.addOverlay(mOverlayOptions);
+                Log.i("result", Integer.toString(result.locationsList.size()));
+                ToastUtils.showToast("获取成功");
+                LatLng startPoint = new LatLng(result.locationsList.get(0).latitude, result.locationsList.get(0).longitude);
+                LatLng endPoint = new LatLng(result.locationsList.get(result.locationsList.size() - 1).latitude, result.locationsList.get(result.locationsList.size() - 1).longitude);
+                BitmapDescriptor bitmap = BitmapDescriptorFactory
+                        .fromResource(R.drawable.start);
+                OverlayOptions option = new MarkerOptions()
+                        .position(startPoint) //必传参数
+                        .icon(bitmap).perspective(true); //必传参数
+//在地图上添加Marker，并显示
+                baiduMap.addOverlay(option);
+                BitmapDescriptor bitmap2 = BitmapDescriptorFactory
+                        .fromResource(R.drawable.end);
+                OverlayOptions option2 = new MarkerOptions()
+                        .position(endPoint) //必传参数
+                        .icon(bitmap2).perspective(true);
+//在地图上添加Marker，并显示
+                baiduMap.addOverlay(option2);
+                /*for (int i = 0; i <  result.locationsList.size(); i++) {
                     LatLng point = new LatLng(result.locationsList.get(i).latitude, result.locationsList.get(i).longitude);
                     items.add(new MyItem(point));
                     Log.i("ww", "onSuccess: "+i);
@@ -214,16 +331,19 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
                             .icon(bitmap);
                     //在地图上添加Marker，并显示
                     baiduMap.addOverlay(option);
-                }
+                }*/
             }
 
             @Override
             public void onError(Exception e) {
-
+                Log.i("错误是：", e.getMessage());
+                ToastUtils.showToast("获取失败");
             }
         });
         HttpManager.addRequest(getHistoryTrackRequest);
     }
+
+
     private GetStationsRequest getStationsRequest;
     public void getStationsLocation (double latitude, double
             longitude){
@@ -259,6 +379,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
                     //在地图上添加Marker，并显示
                     baiduMap.addOverlay(option);
                 }
+                ToastUtils.showToast("获取成功");
 //                mClusterManager.addItems(items);
 //                LatLng point = new LatLng(result.stations.latitude, result.stations.longitude);
 //                //构建Marker图标
@@ -275,6 +396,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
             @Override
             public void onError(Exception e) {
                 Log.i(TAG, "onError:");
+                ToastUtils.showToast("获取失败");
             }
         });
         HttpManager.addRequest(getStationsRequest);
@@ -364,21 +486,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-//            StringBuilder currentPosition = new StringBuilder();
-//            currentPosition.append("纬度：").append(location.getLatitude()).append("\n");
-//            currentPosition.append("经线：").append(location.getLongitude()).append("\n");
-//            currentPosition.append("国家：").append(location.getCountry()).append("\n");
-//            currentPosition.append("省：").append(location.getProvince()).append("\n");
-//            currentPosition.append("市：").append(location.getCity()).append("\n");
-//            currentPosition.append("区：").append(location.getDistrict()).append("\n");
-//            currentPosition.append("街道：").append(location.getStreet()).append("\n");
-//            currentPosition.append("定位方式：");
-//            if (location.getLocType() == BDLocation.TypeGpsLocation) {
-//                currentPosition.append("GPS");
-//            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
-//                currentPosition.append("网络");
-//            }
-//            positionText.setText(currentPosition);
+
             if (location.getLocType() == BDLocation.TypeGpsLocation
                     || location.getLocType() == BDLocation.TypeNetWorkLocation) {
                 navigateTo(location);
