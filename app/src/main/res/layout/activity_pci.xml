@@ -19,14 +19,7 @@
         android:layout_marginTop="10dip"
         android:text="开始" />
 
-    <!--<Button
-        android:id="@+id/buttongetstation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dip"
-        android:text="查看历史数据" />-->
+
 
     <Button
         android:id="@+id/buttonFinish"
@@ -37,72 +30,8 @@
         android:layout_marginRight="25dp"
         android:layout_marginTop="10dip"
         android:text="停止" />
-    />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/buttonFinish"
-        android:background="@android:color/white">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PCIALL"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:src="@drawable/ic_blue_circle"
-                android:layout_gravity="center"
-                />
-            <TextView
-                android:id="@+id/pciblue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:src="@drawable/ic_red_circle"
-                android:layout_gravity="center"
-                />
-            <TextView
-                android:id="@+id/pcired"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:src="@drawable/ic_seagreen_circle"
-                android:layout_gravity="center"
-                />
-            <TextView
-                android:id="@+id/pciseagreen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-        </LinearLayout>
-
-    </LinearLayout>
     <TextView
         android:id="@+id/LatandLong"
         android:layout_width="wrap_content"

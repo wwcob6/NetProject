@@ -33,6 +33,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.punuo.sys.net.adapter.Content;
 import com.punuo.sys.net.adapter.DataAdapter;
 
@@ -68,6 +72,8 @@ import top.androidman.SuperButton;
 
 @RuntimePermissions
 public class MainActivity extends BaseActivity{
+    public LocationClient mLocationClient = null;
+    private MyLocationListener myListener = new MyLocationListener();
     private TelephonyManager telephonyManager;
     private List<CellInfo> cellInfoList;
     private TextView displayIdentity;
@@ -128,6 +134,18 @@ public class MainActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(myListener);
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setCoorType("bd09ll");
+        option.setScanSpan(1000);
+        option.setOpenGps(true);
+        option.setLocationNotify(true);
+        option.setIgnoreKillProcess(false);
+        mLocationClient.setLocOption(option);
+        mLocationClient.start();
+
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         netType = findViewById(R.id.netType);
         superButton = findViewById(R.id.return_button);
@@ -204,6 +222,47 @@ public class MainActivity extends BaseActivity{
 
     }
 
+    public class MyLocationListener extends BDAbstractLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation location){
+            //此处的BDLocation为定位结果信息类，通过它的各种get方法可获取定位相关的全部结果
+            //以下只列举部分获取经纬度相关（常用）的结果信息
+            //更多结果信息获取说明，请参照类参考中BDLocation类中的说明
+
+            double latitude = location.getLatitude();    //获取纬度信息
+            double longitude = location.getLongitude();    //获取经度信息
+            float radius = location.getRadius();    //获取定位精度，默认值为0.0f
+
+            String coorType = location.getCoorType();
+            //获取经纬度坐标类型，以LocationClientOption中设置过的坐标类型为准
+            Log.i("经纬度1", latitude+"+"+longitude);
+
+            locationUpdates(location);
+            int errorCode = location.getLocType();
+            //获取定位类型、定位错误返回码，具体信息可参照类参考中BDLocation类中的说明
+        }
+    }
+    public void locationUpdates(BDLocation location) {  //获取指定的查询信息
+        //如果location不为空时
+        if (location != null) {
+            StringBuilder stringBuilder = new StringBuilder();        //使用StringBuilder保存数据
+            //获取经度、纬度、等属性值
+            DecimalFormat decimalFormat = new DecimalFormat("#.000000");
+            String longitude = decimalFormat.format(location.getLongitude());
+            String latitude  = decimalFormat.format(location.getLatitude());
+            stringBuilder.append("您的位置信息：");
+            stringBuilder.append("经度：");
+            stringBuilder.append(longitude);
+            stringBuilder.append("纬度：");
+            stringBuilder.append(latitude);
+            Log.i(TAG, "locationUpdates: "+stringBuilder.toString());
+            infoMap.put(14,longitude);
+            infoMap.put(15,latitude);
+        } else {
+            //否则输出空信息
+            Log.i(TAG, "没有获取到GPS信息");
+        }
+    }
     @NeedsPermission(Manifest.permission.READ_PHONE_STATE)
     void is5GConnected() {
         if (Build.VERSION.SDK_INT >= 29) {
@@ -294,9 +353,9 @@ public class MainActivity extends BaseActivity{
         MainActivityPermissionsDispatcher.getAllCellInfoWithCheck(this);
         getOtherData();
 
-        for (Map.Entry<Integer, Object> entry : infoMap.entrySet()) {
+        /*for (Map.Entry<Integer, Object> entry : infoMap.entrySet()) {
             Log.i(TAG, "整个map中的数据 ：key= " + entry.getKey() + " and value= " + entry.getValue());
-        }
+        }*/
 
         pushInfo();
         showData();
@@ -404,8 +463,13 @@ public class MainActivity extends BaseActivity{
         } else {
             return;
         }
-        mPushRequest.addUrlParam("THROUGHPUT_UL",infoMap.get(16));
-        mPushRequest.addUrlParam("THROUGHPUT_DL",infoMap.get(17));
+        if (infoMap.get(16) != "null") {
+            mPushRequest.addUrlParam("THROUGHPUT_UL",infoMap.get(16));
+            mPushRequest.addUrlParam("THROUGHPUT_DL",infoMap.get(17));
+        }else {
+            return;
+        }
+
         mPushRequest.setRequestListener(new RequestListener<BaseModel>() {
 
             @Override
@@ -450,7 +514,7 @@ public class MainActivity extends BaseActivity{
 //                }
                 judgeTheConnect("www.baidu.com");
                 getNetSpeed();
-                getLocation();
+                //getLocation();
                 Looper.loop();
             }
         }).start();
@@ -587,7 +651,7 @@ public class MainActivity extends BaseActivity{
     /**
      * 获取经纬度
      */
-    public void getLocation(){
+    /*public void getLocation(){
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         //添加权限检查
@@ -632,28 +696,8 @@ public class MainActivity extends BaseActivity{
                 });
         //从GPS获取最新的定位信息
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Log.i("经纬度2", location.getLatitude()+"+"+location.getLongitude());
         locationUpdates(location);    //将最新的定位信息传递给创建的locationUpdates()方法中
-    }
+    }*/
 
-    public void locationUpdates(Location location) {  //获取指定的查询信息
-        //如果location不为空时
-        if (location != null) {
-            StringBuilder stringBuilder = new StringBuilder();        //使用StringBuilder保存数据
-            //获取经度、纬度、等属性值
-            DecimalFormat decimalFormat = new DecimalFormat("#.000000");
-            String longitude = decimalFormat.format(location.getLongitude());
-            String latitude  = decimalFormat.format(location.getLatitude());
-            stringBuilder.append("您的位置信息：");
-            stringBuilder.append("经度：");
-            stringBuilder.append(longitude);
-            stringBuilder.append("纬度：");
-            stringBuilder.append(latitude); 
-            Log.i(TAG, "locationUpdates: "+stringBuilder.toString());
-            infoMap.put(14,longitude);
-            infoMap.put(15,latitude);
-        } else {
-            //否则输出空信息
-            Log.i(TAG, "没有获取到GPS信息");
-        }
-    }
 }

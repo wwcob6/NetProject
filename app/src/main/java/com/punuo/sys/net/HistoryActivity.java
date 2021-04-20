@@ -144,6 +144,7 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
         mTimerPicker = new CustomDatePicker(this, new CustomDatePicker.Callback() {
             @Override
             public void onTimeSelected(long timestamp, String string) {
+                baiduMap.clear();
                 if (string == null) string = "RSRP";
                 //mTvSelectedTime.setText(DateFormatUtils.long2Str(timestamp, true));
                 Log.i("nono", DateFormatUtils.long2Str(timestamp, true) + "和" + string);
@@ -305,14 +306,14 @@ public class HistoryActivity extends Activity implements View.OnClickListener {
                 LatLng startPoint = new LatLng(result.locationsList.get(0).latitude, result.locationsList.get(0).longitude);
                 LatLng endPoint = new LatLng(result.locationsList.get(result.locationsList.size() - 1).latitude, result.locationsList.get(result.locationsList.size() - 1).longitude);
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
-                        .fromResource(R.drawable.start);
+                        .fromResource(R.drawable.start_point);
                 OverlayOptions option = new MarkerOptions()
                         .position(startPoint) //必传参数
                         .icon(bitmap).perspective(true); //必传参数
 //在地图上添加Marker，并显示
                 baiduMap.addOverlay(option);
                 BitmapDescriptor bitmap2 = BitmapDescriptorFactory
-                        .fromResource(R.drawable.end);
+                        .fromResource(R.drawable.end_point);
                 OverlayOptions option2 = new MarkerOptions()
                         .position(endPoint) //必传参数
                         .icon(bitmap2).perspective(true);
